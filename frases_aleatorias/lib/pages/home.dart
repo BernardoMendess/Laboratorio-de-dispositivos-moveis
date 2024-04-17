@@ -1,4 +1,4 @@
-import 'dart:ffi';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -11,6 +11,8 @@ class Home extends StatefulWidget{
 }
 
 class HomeState extends State<Home>{
+
+  var random = Random();
 
   List<String> frases = [
     'A vida é uma jornada, não um destino.',
@@ -28,7 +30,6 @@ class HomeState extends State<Home>{
     'A gratidão é a memória do coração.',
     'A gentileza gera gentileza.',
     'A honestidade é a melhor política.',
-    'A coragem não é a ausência de medo, mas a capacidade de enfrentá-lo.',
     'A mudança é a única constante na vida.',
     'A perseverança é a mãe do sucesso.',
     'A educação é a chave para o futuro.',
@@ -37,7 +38,6 @@ class HomeState extends State<Home>{
     'A paz começa com um sorriso.',
     'A natureza é a melhor professora.',
     'A música é a linguagem universal da humanidade.',
-    'A família é onde a vida começa e o amor nunca termina.',
     'A risada é o melhor remédio.',
     'A imaginação é mais importante que o conhecimento.',
     'A vida é cheia de surpresas.',
@@ -47,36 +47,45 @@ class HomeState extends State<Home>{
 
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(
+  Widget build(BuildContext context) { 
+    return Container(
+    decoration: BoxDecoration(
+      border: Border.all(
+        color: Colors.white,  // Cor da borda
+        width: 4.0,         // Espessura da borda
+      ),
+    ), child: Scaffold(appBar: AppBar(
         title: Text("Frases Aleatórias", style: TextStyle(color: Colors.white),
         ),
         backgroundColor: (Colors.green),
     ),
     body: Center( child: Container(
       
-decoration: BoxDecoration(
-border: Border.all(width: 3, color: Colors.blue),
-),
+decoration: BoxDecoration(),
       child: Column(children: [
         Image.asset("images/title.png", 
         width: 400,
         height: 400,),
-        Padding(padding: EdgeInsets.all(40)),
-        Text("Clique abaixo para gerar uma frase", style: TextStyle(fontSize: 20),),
-        Padding(padding: EdgeInsets.all(40)),
+        Padding(padding: EdgeInsets.all(20)),
+        Text("Clique abaixo para gerar uma frase", style: TextStyle(fontSize: 20, color: Colors.orange),),
+        Padding(padding: EdgeInsets.all(20)),
+        Text(frases[random.nextInt(frases.length)], style: TextStyle(fontSize: 20),),
+        Padding(padding: EdgeInsets.all(20)),
         ElevatedButton(onPressed: (){
           setState(() {
 
             });
         }, 
         child: Text("Clique aqui"),
-        )
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(Colors.green), // Cor do fundo
+          foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+        ),),
       ],
       ),
       ),
       ),
-  
+    ),
     );
   }
 
