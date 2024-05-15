@@ -1,0 +1,68 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+class FutureHome extends StatefulWidget{
+  const futureHome({super.key});
+
+  @override
+  State<FutureHome> createState() => _FutureHomeState();
+
+}
+
+class _FutureHomeState extends State<FutureHome>{
+  String logradouro = "", bairro = "", cidade = "";
+  TextEditingController cepController = TextEditingController();
+
+  Future<Map> getCep() async {
+    String cep = cepController.text;
+    String url = "https://viacep.com.br/ws/$cep/json/";
+    http.Response response = await http.get(Uri.parse(url));
+
+    print(response.body);
+    Map<String, dynamic> ret = jsonDecode(response.body);
+    logradouro = ret["logradouro"];
+    bairro = ret["bairro"];
+    cidade = ret["localidade"];
+
+    return ret;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Via CEP")),
+      body: Center(
+        child: Column(
+          children: [
+            TextField(
+              keyboardType: TextInputType.text,
+              controller: cepController,
+              decoration: InputDecoration(
+                labelText: "Cep: "
+                
+              ),
+            ),
+            FutureBuilder(
+              future: getCep(),
+              builder: (context, snapshot) {
+                String result = "";
+
+                if(snapshot.hasData) { 
+                  result = snapshot.data["bairro"];
+                } else if(snapshot.hasError) { 
+                  
+                }
+              }
+            ),
+
+            ElevatedButton(
+              onPressed: getCep, 
+              child: Text("Buscar"))
+          ],
+        ),
+        ),
+    );
+  }
+}

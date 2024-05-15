@@ -70,6 +70,7 @@ class GameState extends State<Game> {
             decoration: BoxDecoration(),
             child: Column(
               children: [
+                Text("Jogador atual: ${jogadorAtual == jogador ? widget.dados : 'Computador'}", style: TextStyle(fontSize: 20),),
                 Expanded(
                   child: GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -79,19 +80,22 @@ class GameState extends State<Game> {
                     itemBuilder: (context, int index) {
                       return InkWell(
                         onTap: () {
-                          if (terminou || ocupado[index].isNotEmpty) {
-                            return;
-                          }
+                        if (terminou || ocupado[index].isNotEmpty) {
+                          return;
+                        }
 
-                          setState(() {
-                            ocupado[index] = jogadorAtual;
-                            jogadorAtual = jogadorAtual == jogador ? maquina : jogador;
-                            checarVencedor();
-                            if (!terminou && jogadorAtual == maquina) {
-                              jogadaComputador();
-                            }
-                          });
-                        },
+                        setState(() {
+                          ocupado[index] = jogadorAtual;
+                          jogadorAtual = jogadorAtual == jogador ? maquina : jogador;
+                          checarVencedor();
+                          if (!terminou && jogadorAtual == maquina) {
+                            jogadaComputador();
+                          }
+                          if (!terminou && !ocupado.contains('')) {
+                            mostrarEmpate();
+                          }
+                        });
+                      },
                         child: Container(
                           color: Colors.black,
                           margin: EdgeInsets.all(4),
@@ -114,6 +118,10 @@ class GameState extends State<Game> {
                           });
                         },
                         child: Text('Reiniciar'),
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                Colors.black), // Cor do fundo
+                            foregroundColor: MaterialStateProperty.all<Color>(Colors.white)),
                       )
                     : Container(),
               ],
@@ -126,7 +134,6 @@ class GameState extends State<Game> {
 
   void checarVencedor() {
     bool venceu = false;
-    // Verifica linhas
     for (int i = 0; i < tamanho; i++) {
       int contador = 0;
       for (int j = 0; j < tamanho; j++) {
@@ -141,7 +148,6 @@ class GameState extends State<Game> {
       }
     }
 
-    // Verifica colunas
     for (int i = 0; i < tamanho; i++) {
       int contador = 0;
       for (int j = 0; j < tamanho; j++) {
@@ -156,7 +162,6 @@ class GameState extends State<Game> {
       }
     }
 
-    // Verifica diagonal principal
     int contadorDiagonalPrincipal = 0;
     for (int i = 0; i < tamanho; i++) {
       if (ocupado[i * tamanho + i] == jogadorAtual) {
@@ -169,7 +174,6 @@ class GameState extends State<Game> {
       return;
     }
 
-    // Verifica diagonal secundária
     int contadorDiagonalSecundaria = 0;
     for (int i = 0; i < tamanho; i++) {
       if (ocupado[i * tamanho + (tamanho - 1 - i)] == jogadorAtual) {
@@ -182,7 +186,6 @@ class GameState extends State<Game> {
       return;
     }
 
-    // Verifica empate
     if (!ocupado.contains('') && venceu == false) {
       mostrarEmpate();
       return;
@@ -190,8 +193,7 @@ class GameState extends State<Game> {
   }
 
   void mostrarResultado() {
-    String mensagem =
-        jogadorAtual == jogador ? "Jogador ${widget.dados} venceu!" : "Computador venceu!";
+    String mensagem = jogadorAtual == jogador ? "Jogador ${widget.dados} venceu!" : "Computador venceu!";
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensagem)));
     terminou = true;
   }
@@ -202,15 +204,16 @@ class GameState extends State<Game> {
   }
 
   void jogadaComputador() {
-    int indiceAleatorio = random.nextInt(tamanho * tamanho);
-    while (ocupado[indiceAleatorio].isNotEmpty) {
-      indiceAleatorio = random.nextInt(tamanho * tamanho);
-    }
-    setState(() {
-      
-      ocupado[indiceAleatorio] = jogadorAtual;
-      jogadorAtual = jogadorAtual == jogador ? maquina : jogador;
-      checarVencedor();
+    Future.delayed(Duration(seconds: 1), () {
+      int indiceAleatorio = random.nextInt(tamanho * tamanho);
+      while (ocupado[indiceAleatorio].isNotEmpty) {
+        indiceAleatorio = random.nextInt(tamanho * tamanho);
+      }
+      setState(() {
+        ocupado[indiceAleatorio] = jogadorAtual;
+        jogadorAtual = jogadorAtual == jogador ? maquina : jogador;
+        checarVencedor();
+      });
     });
   }
 }
